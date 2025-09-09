@@ -74,13 +74,24 @@ $project_name = $project ? $project['project_name'] : '';
     <h1>Properties for Project: <?php echo htmlspecialchars($project_name); ?></h1>
     <a href="projects.php">&larr; Back to Projects</a>
     <h2><?php echo $edit_property ? 'Edit Property' : 'Add Property'; ?></h2>
-    <form method="post">
+    <form method="post" id="propertyForm">
         <?php if ($edit_property): ?>
             <input type="hidden" name="property_id" value="<?php echo $edit_property['property_id']; ?>">
         <?php endif; ?>
         <input type="text" name="property_name" placeholder="Property Name" required value="<?php echo $edit_property['property_name'] ?? ''; ?>">
-        <input type="text" name="property_value" placeholder="Property Value" required value="<?php echo $edit_property['property_value'] ?? ''; ?>">
-        <select name="selection_type">
+        <span id="valueInputContainer">
+        <?php
+        $is_multiselect = ($edit_property['selection_type'] ?? '') === 'multiselect';
+        $property_value = $edit_property['property_value'] ?? '';
+        ?>
+        <input type="hidden" id="selection_type_hidden" value="<?php echo $is_multiselect ? 'multiselect' : 'single'; ?>">
+        <?php if ($is_multiselect): ?>
+            <textarea name="property_value" placeholder="Enter values, one per line" required rows="3"><?php echo htmlspecialchars($property_value); ?></textarea>
+        <?php else: ?>
+            <input type="text" name="property_value" placeholder="Property Value" required value="<?php echo htmlspecialchars($property_value); ?>">
+        <?php endif; ?>
+        </span>
+        <select name="selection_type" id="selection_type" onchange="toggleValueInput()">
             <option value="single" <?php if (($edit_property['selection_type'] ?? '') === 'single') echo 'selected'; ?>>Single</option>
             <option value="multiselect" <?php if (($edit_property['selection_type'] ?? '') === 'multiselect') echo 'selected'; ?>>Multiselect</option>
         </select>
@@ -91,6 +102,20 @@ $project_name = $project ? $project['project_name'] : '';
             <a href="project_properties.php?project_id=<?php echo $project_id; ?>">Cancel</a>
         <?php endif; ?>
     </form>
+    <script>
+    function toggleValueInput() {
+        var sel = document.getElementById('selection_type');
+        var container = document.getElementById('valueInputContainer');
+        var value = '';
+        var current = container.querySelector('input[name="property_value"], textarea[name="property_value"]');
+        if (current) value = current.value;
+        if (sel.value === 'multiselect') {
+            container.innerHTML = '<textarea name="property_value" placeholder="Enter values, one per line" required rows="3">' + value + '</textarea>';
+        } else {
+            container.innerHTML = '<input type="text" name="property_value" placeholder="Property Value" required value="' + value + '">';
+        }
+    }
+    </script>
     <table>
         <tr>
             <th>ID</th>
