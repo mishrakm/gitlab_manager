@@ -37,14 +37,73 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Login</title>
     <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Roboto', Arial, sans-serif; background: #f6f8fa; margin: 0; padding: 0; }
-        .container { max-width: 400px; margin: 80px auto; background: #fff; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); padding: 36px 40px 40px 40px; }
-        h1 { color: #2d3a4b; margin-top: 0; text-align: center; }
-        form { display: flex; flex-direction: column; gap: 18px; }
-        input[type="text"], input[type="password"] { font-size: 1rem; padding: 10px 12px; border: 1px solid #bfc9d1; border-radius: 5px; background: #fff; }
-        button { background: #1976d2; color: #fff; border: none; border-radius: 5px; padding: 10px 0; font-size: 1rem; font-weight: 500; cursor: pointer; transition: background 0.2s; }
-        button:hover { background: #1256a3; }
-        .error { color: #d32f2f; font-weight: 500; margin-bottom: 10px; text-align: center; }
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            background: linear-gradient(120deg, #e3eaf3 0%, #f6f8fa 100%);
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 400px;
+            margin: 80px auto;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(25, 118, 210, 0.10), 0 1.5px 6px rgba(0,0,0,0.04);
+            padding: 40px 44px 44px 44px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            color: #1976d2;
+            margin-top: 0;
+            text-align: center;
+            font-size: 2.1rem;
+            letter-spacing: 1px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+            width: 100%;
+        }
+        input[type="text"], input[type="password"] {
+            font-size: 1.08rem;
+            padding: 12px 14px;
+            border: 1.5px solid #bfc9d1;
+            border-radius: 7px;
+            background: #f7fafd;
+            transition: border 0.2s;
+        }
+        input[type="text"]:focus, input[type="password"]:focus {
+            border: 1.5px solid #1976d2;
+            outline: none;
+            background: #fff;
+        }
+        button {
+            background: linear-gradient(90deg, #1976d2 60%, #1256a3 100%);
+            color: #fff;
+            border: none;
+            border-radius: 7px;
+            padding: 12px 0;
+            font-size: 1.08rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            box-shadow: 0 2px 8px rgba(25, 118, 210, 0.08);
+        }
+        button:hover {
+            background: linear-gradient(90deg, #1256a3 60%, #1976d2 100%);
+        }
+        .error {
+            color: #d32f2f;
+            font-weight: 500;
+            margin-bottom: 10px;
+            text-align: center;
+            background: #ffeaea;
+            border-radius: 6px;
+            padding: 8px 0;
+        }
     </style>
 </head>
 <body>
