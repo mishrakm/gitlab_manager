@@ -195,7 +195,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin-top: 6px;
             min-width: 180px;
         }
-        form button {
+        .button-row {
+            display: flex;
+            gap: 16px;
+            margin-top: 18px;
+        }
+        form button, .fallback-btn {
             background: #1976d2;
             color: #fff;
             border: none;
@@ -205,9 +210,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-weight: 500;
             cursor: pointer;
             transition: background 0.2s;
-            margin-top: 18px;
         }
-        form button:hover {
+        form button:hover, .fallback-btn:hover {
             background: #1256a3;
         }
         .form-group {
@@ -283,7 +287,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php endif; ?>
             </div>
             <?php endforeach; ?>
-            <button type="submit">Submit</button>
+            <div class="button-row">
+                <button type="submit">Submit</button>
+            </div>
         </form>
         <?php if ($_SERVER['REQUEST_METHOD'] === 'POST'): ?>
         <div class="result-section">
@@ -307,7 +313,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php if (!empty($curl_failed)): ?>
                 <div style="margin-top:1em;">
                     <b>Fallback: Trigger from your browser</b><br>
-                    <button class="fallback-btn" onclick="triggerFromBrowser(); return false;">Trigger Pipeline via Browser</button>
+                    <div class="button-row">
+                        <button class="fallback-btn" onclick="triggerFromBrowser(); return false;">Trigger Pipeline via Browser</button>
+                    </div>
                     <div id="jsResult"></div>
                     <script>
                     function triggerFromBrowser() {
