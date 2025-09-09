@@ -79,6 +79,10 @@ $project_name = $project ? $project['project_name'] : '';
             <input type="hidden" name="property_id" value="<?php echo $edit_property['property_id']; ?>">
         <?php endif; ?>
         <input type="text" name="property_name" placeholder="Property Name" required value="<?php echo $edit_property['property_name'] ?? ''; ?>">
+        <select name="selection_type" id="selection_type" onchange="toggleValueInput()">
+            <option value="single" <?php if (($edit_property['selection_type'] ?? '') === 'single') echo 'selected'; ?>>Single</option>
+            <option value="multiselect" <?php if (($edit_property['selection_type'] ?? '') === 'multiselect') echo 'selected'; ?>>Multiselect</option>
+        </select>
         <span id="valueInputContainer">
         <?php
         $is_multiselect = ($edit_property['selection_type'] ?? '') === 'multiselect';
@@ -91,10 +95,6 @@ $project_name = $project ? $project['project_name'] : '';
             <input type="text" name="property_value" placeholder="Property Value" required value="<?php echo htmlspecialchars($property_value); ?>">
         <?php endif; ?>
         </span>
-        <select name="selection_type" id="selection_type" onchange="toggleValueInput()">
-            <option value="single" <?php if (($edit_property['selection_type'] ?? '') === 'single') echo 'selected'; ?>>Single</option>
-            <option value="multiselect" <?php if (($edit_property['selection_type'] ?? '') === 'multiselect') echo 'selected'; ?>>Multiselect</option>
-        </select>
         <button type="submit" name="<?php echo $edit_property ? 'edit' : 'add'; ?>">
             <?php echo $edit_property ? 'Update' : 'Add'; ?>
         </button>
