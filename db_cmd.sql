@@ -1,5 +1,5 @@
-mysql -u root -p -e "CREATE DATABASE gitlab_manager;"
-CREATE USER 'gitlab_user'@'localhost' IDENTIFIED BY 'your_password';
+CREATE DATABASE gitlab_manager;
+CREATE USER 'gitlab_user'@'localhost' IDENTIFIED BY 'Plus@1234';
 GRANT ALL PRIVILEGES ON gitlab_manager.* TO 'gitlab_user'@'localhost';
 FLUSH PRIVILEGES;
 CREATE TABLE projects (
