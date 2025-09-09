@@ -85,10 +85,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     if (curl_errno($ch)) {
         $trigger_error = 'Build trigger failed: ' . curl_error($ch);
+        $curl_failed = true;
     } else if ($http_code >= 400) {
         $trigger_error = 'Build trigger failed: HTTP ' . $http_code . ' - ' . htmlspecialchars($response);
+        $curl_failed = true;
     } else {
         $trigger_result = json_decode($response, true);
+        $curl_failed = false;
     }
     curl_close($ch);
 }
@@ -144,6 +147,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h2>Pipeline Trigger Result</h2>
         <?php if ($trigger_error): ?>
             <div style="color:red;"><b><?php echo $trigger_error; ?></b></div>
+            <?php if (!empty($curl_failed)): ?>
+            <div style="margin-top:1em;">
+                <b>Fallback: Trigger from your browser</b><br>
+                <button onclick="triggerFromBrowser(); return false;">Trigger Pipeline via Browser</button>
+                <div id="jsResult"></div>
+                <script>
+                function triggerFromBrowser() {
+                    var formData = new FormData();
+                    formData.append('token', <?php echo json_encode($project['trigger_token']); ?>);
+                    formData.append('ref', <?php echo json_encode($project['branch']); ?>);
+                    formData.append('variables[flags]', <?php echo json_encode($flags_str); ?>);
+                    fetch(<?php echo json_encode($url); ?>, {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(r => r.json())
+                    .then(data => {
+                        let html = '';
+                        if (data.error) {
+                            html = '<span style="color:red;"><b>Error:</b> ' + data.error + '</span>';
+                        } else {
+                            html = `<div><b>Pipeline ID:</b> ${data.id || ''}</div>` +
+                                   `<div><b>Status:</b> ${data.status || ''}</div>` +
+                                   `<div><b>Branch:</b> ${data.ref || ''}</div>` +
+                                   `<div><b>Commit SHA:</b> ${data.sha || ''}</div>` +
+                                   `<div><b>Triggered by:</b> ${(data.user ? data.user.name + ' (' + data.user.username + ')' : 'N/A')}</div>` +
+                                   `<div><b>Created at:</b> ${data.created_at || ''}</div>` +
+                                   `<div><b>Pipeline URL:</b> <a href="${data.web_url}" target="_blank">${data.web_url || ''}</a></div>`;
+                        }
+                        document.getElementById('jsResult').innerHTML = html;
+                    })
+                    .catch(e => {
+                        document.getElementById('jsResult').innerHTML = '<span style="color:red;">Build trigger failed: ' + e.message + '</span>';
+                    });
+                }
+                </script>
+            </div>
+            <?php endif; ?>
         <?php elseif ($trigger_result): ?>
             <?php if (isset($trigger_result['error'])): ?>
                 <div style="color:red;"><b>Error:</b> <?php echo htmlspecialchars($trigger_result['error']); ?></div>
