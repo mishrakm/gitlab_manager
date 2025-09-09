@@ -22,3 +22,11 @@ CREATE TABLE project_properties (
     selection_type ENUM('single', 'multiselect') NOT NULL DEFAULT 'single',
     FOREIGN KEY (project_id) REFERENCES projects(project_id) ON DELETE CASCADE
 );
+
+-- SQL to create the users table
+CREATE TABLE users (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    usertype ENUM('admin', 'developer', 'deployer') NOT NULL DEFAULT 'developer'
+);

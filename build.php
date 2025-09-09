@@ -1,4 +1,11 @@
 <?php
+session_start();
+if (!isset($_SESSION['user_id']) || !in_array($_SESSION['usertype'], ['admin', 'deployer'])) {
+    header('Location: index.php');
+    exit;
+}
+?>
+<?php
 require_once 'connection.php';
 
 // Step 1: List all projects
