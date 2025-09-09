@@ -212,19 +212,3 @@ $properties = $stmt->fetchAll();
     </div>
 </body>
 </html>
-        </tr>
-        <?php foreach ($properties as $property): ?>
-        <tr>
-            <td><?php echo $property['property_id']; ?></td>
-            <td><?php echo htmlspecialchars($property['property_name']); ?></td>
-            <td><?php echo htmlspecialchars($property['property_value']); ?></td>
-            <td><?php echo $property['selection_type']; ?></td>
-            <td>
-                <a href="project_properties.php?project_id=<?php echo $project_id; ?>&edit=<?php echo $property['property_id']; ?>">Edit</a> |
-                <a href="project_properties.php?project_id=<?php echo $project_id; ?>&delete=<?php echo $property['property_id']; ?>" onclick="return confirm('Delete this property?');">Delete</a>
-            </td>
-        </tr>
-        <?php endforeach; ?>
-    </table>
-</body>
-</html>
