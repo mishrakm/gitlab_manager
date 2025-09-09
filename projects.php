@@ -105,7 +105,8 @@ if (isset($_GET['edit'])) {
             <td><?php echo $project['create_date']; ?></td>
             <td>
                 <a href="projects.php?edit=<?php echo $project['project_id']; ?>">Edit</a> |
-                <a href="projects.php?delete=<?php echo $project['project_id']; ?>" onclick="return confirm('Delete this project?');">Delete</a>
+                <a href="projects.php?delete=<?php echo $project['project_id']; ?>" onclick="return confirm('Delete this project?');">Delete</a> |
+                <a href="project_properties.php?project_id=<?php echo $project['project_id']; ?>">Properties</a>
             </td>
         </tr>
         <?php endforeach; ?>
