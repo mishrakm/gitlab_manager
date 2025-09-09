@@ -18,6 +18,7 @@ if (isset($_POST['add'])) {
     exit;
 }
 
+    // Validation helper
 // Handle Edit Property
 if (isset($_POST['edit'])) {
     $property_id = $_POST['property_id'];
