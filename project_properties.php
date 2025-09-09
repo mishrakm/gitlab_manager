@@ -46,6 +46,7 @@ $stmt->execute([$project_id]);
 $properties = $stmt->fetchAll();
 
 // Fetch property for editing
+?>
 <html>
 <head>
     <title>Project Properties</title>
