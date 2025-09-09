@@ -1,0 +1,43 @@
+function triggerBuild() {
+      const projectIndex = document.getElementById('projects').value;
+      const featureValue = document.getElementById('featureFlags').value;
+      const extraDropdown = document.getElementById('extraOptions');
+      const extraSelected = Array.from(extraDropdown.selectedOptions).map(opt => opt.value);
+      const extraValue = extraSelected.join(' ');
+
+      let combinedFlags = featureValue;
+      if (extraValue) combinedFlags += ' ' + extraValue;
+
+      const project = projectsData[projectIndex];
+
+      const formData = new FormData();
+      formData.append('token', project.trigger_token);
+      formData.append('variables[flags]', combinedFlags.trim());
+      formData.append('ref', project.branch);
+
+      fetch(`https://pwgit.centralindia.cloudapp.azure.com/api/v4/projects/${project.projectid}/trigger/pipeline`, {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(result => {
+        document.getElementById('output').innerHTML = formatResult(result);
+      })
+      .catch(error => {
+        document.getElementById('error').innerText = "Build trigger failed: " + error.message;
+      });
+    }
+
+    function formatResult(data) {
+      if (data.error) return `<span class="label">Error:</span> ${data.error}`;
+
+      return `
+        <div><span class="label">Pipeline ID:</span> ${data.id}</div>
+        <div><span class="label">Status:</span> ${data.status}</div>
+        <div><span class="label">Branch:</span> ${data.ref}</div>
+        <div><span class="label">Commit SHA:</span> ${data.sha}</div>
+        <div><span class="label">Triggered by:</span> ${data.user ? data.user.name : 'N/A'} (${data.user ? data.user.username : 'N/A'})</div>
+        <div><span class="label">Created at:</span> ${data.created_at}</div>
+        <div><span class="label">Pipeline URL:</span> <a href="${data.web_url}" target="_blank">${data.web_url}</a></div>
+      `;
+    }
