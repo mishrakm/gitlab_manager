@@ -5,8 +5,11 @@ require_once 'connection.php';
 if (isset($_POST['add'])) {
     $name = $_POST['project_name'];
     $status = $_POST['status'];
-    $stmt = $pdo->prepare("INSERT INTO projects (project_name, status) VALUES (?, ?)");
-    $stmt->execute([$name, $status]);
+    $git_project_id = $_POST['git_project_id'];
+    $branch = $_POST['branch'];
+    $trigger_token = $_POST['trigger_token'];
+    $stmt = $pdo->prepare("INSERT INTO projects (project_name, status, git_project_id, branch, trigger_token) VALUES (?, ?, ?, ?, ?)");
+    $stmt->execute([$name, $status, $git_project_id, $branch, $trigger_token]);
     header("Location: projects.php");
     exit;
 }
@@ -16,8 +19,11 @@ if (isset($_POST['edit'])) {
     $id = $_POST['project_id'];
     $name = $_POST['project_name'];
     $status = $_POST['status'];
-    $stmt = $pdo->prepare("UPDATE projects SET project_name=?, status=? WHERE project_id=?");
-    $stmt->execute([$name, $status, $id]);
+    $git_project_id = $_POST['git_project_id'];
+    $branch = $_POST['branch'];
+    $trigger_token = $_POST['trigger_token'];
+    $stmt = $pdo->prepare("UPDATE projects SET project_name=?, status=?, git_project_id=?, branch=?, trigger_token=? WHERE project_id=?");
+    $stmt->execute([$name, $status, $git_project_id, $branch, $trigger_token, $id]);
     header("Location: projects.php");
     exit;
 }
@@ -63,6 +69,9 @@ if (isset($_GET['edit'])) {
             <input type="hidden" name="project_id" value="<?php echo $edit_project['project_id']; ?>">
         <?php endif; ?>
         <input type="text" name="project_name" placeholder="Project Name" required value="<?php echo $edit_project['project_name'] ?? ''; ?>">
+        <input type="number" name="git_project_id" placeholder="Git Project ID" value="<?php echo $edit_project['git_project_id'] ?? ''; ?>">
+        <input type="text" name="branch" placeholder="Branch" value="<?php echo $edit_project['branch'] ?? ''; ?>">
+        <input type="text" name="trigger_token" placeholder="Trigger Token" value="<?php echo $edit_project['trigger_token'] ?? ''; ?>">
         <select name="status">
             <option value="active" <?php if (($edit_project['status'] ?? '') === 'active') echo 'selected'; ?>>Active</option>
             <option value="inactive" <?php if (($edit_project['status'] ?? '') === 'inactive') echo 'selected'; ?>>Inactive</option>
@@ -78,6 +87,9 @@ if (isset($_GET['edit'])) {
         <tr>
             <th>ID</th>
             <th>Name</th>
+            <th>Git Project ID</th>
+            <th>Branch</th>
+            <th>Trigger Token</th>
             <th>Status</th>
             <th>Created</th>
             <th>Actions</th>
@@ -86,6 +98,9 @@ if (isset($_GET['edit'])) {
         <tr>
             <td><?php echo $project['project_id']; ?></td>
             <td><?php echo htmlspecialchars($project['project_name']); ?></td>
+            <td><?php echo $project['git_project_id']; ?></td>
+            <td><?php echo htmlspecialchars($project['branch']); ?></td>
+            <td><?php echo htmlspecialchars($project['trigger_token']); ?></td>
             <td><?php echo $project['status']; ?></td>
             <td><?php echo $project['create_date']; ?></td>
             <td>
