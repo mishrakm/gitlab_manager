@@ -46,6 +46,13 @@ $stmt->execute([$project_id]);
 $properties = $stmt->fetchAll();
 
 // Fetch property for editing
+$edit_property = null;
+if (isset($_GET['edit'])) {
+    $property_id = intval($_GET['edit']);
+    $stmt = $pdo->prepare("SELECT * FROM project_properties WHERE property_id=?");
+    $stmt->execute([$property_id]);
+    $edit_property = $stmt->fetch();
+}
 ?>
 <html>
 <head>
