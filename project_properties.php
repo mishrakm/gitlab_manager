@@ -83,18 +83,12 @@ $project_name = $project ? $project['project_name'] : '';
             <option value="single" <?php if (($edit_property['selection_type'] ?? '') === 'single') echo 'selected'; ?>>Single</option>
             <option value="multiselect" <?php if (($edit_property['selection_type'] ?? '') === 'multiselect') echo 'selected'; ?>>Multiselect</option>
         </select>
-        <span id="valueInputContainer">
-        <?php
-        $is_multiselect = ($edit_property['selection_type'] ?? '') === 'multiselect';
-        $property_value = $edit_property['property_value'] ?? '';
-        ?>
-        <input type="hidden" id="selection_type_hidden" value="<?php echo $is_multiselect ? 'multiselect' : 'single'; ?>">
-        <?php if ($is_multiselect): ?>
-            <textarea name="property_value" placeholder="Enter values, one per line" required rows="3"><?php echo htmlspecialchars($property_value); ?></textarea>
-        <?php else: ?>
-            <input type="text" name="property_value" placeholder="Property Value" required value="<?php echo htmlspecialchars($property_value); ?>">
-        <?php endif; ?>
-        </span>
+    <span id="valueInputContainer">
+    <?php
+    $property_value = $edit_property['property_value'] ?? '';
+    ?>
+    <textarea name="property_value" placeholder="Enter value(s), one per line for multiselect" required rows="3"><?php echo htmlspecialchars($property_value); ?></textarea>
+    </span>
         <button type="submit" name="<?php echo $edit_property ? 'edit' : 'add'; ?>">
             <?php echo $edit_property ? 'Update' : 'Add'; ?>
         </button>
@@ -102,20 +96,7 @@ $project_name = $project ? $project['project_name'] : '';
             <a href="project_properties.php?project_id=<?php echo $project_id; ?>">Cancel</a>
         <?php endif; ?>
     </form>
-    <script>
-    function toggleValueInput() {
-        var sel = document.getElementById('selection_type');
-        var container = document.getElementById('valueInputContainer');
-        var value = '';
-        var current = container.querySelector('input[name="property_value"], textarea[name="property_value"]');
-        if (current) value = current.value;
-        if (sel.value === 'multiselect') {
-            container.innerHTML = '<textarea name="property_value" placeholder="Enter values, one per line" required rows="3">' + value + '</textarea>';
-        } else {
-            container.innerHTML = '<input type="text" name="property_value" placeholder="Property Value" required value="' + value + '">';
-        }
-    }
-    </script>
+    <!-- No JS needed: always textarea for property_value -->
     <table>
         <tr>
             <th>ID</th>
