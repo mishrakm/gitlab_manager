@@ -25,8 +25,9 @@ if (!isset($_GET['project_id'])) {
 }
 
 // Step 2: Show dynamic form for selected project
+
 $project_id = intval($_GET['project_id']);
-$stmt = $pdo->prepare("SELECT project_name FROM projects WHERE project_id=?");
+$stmt = $pdo->prepare("SELECT * FROM projects WHERE project_id=?");
 $stmt->execute([$project_id]);
 $project = $stmt->fetch();
 if (!$project) die('Project not found.');
@@ -36,8 +37,10 @@ $stmt = $pdo->prepare("SELECT * FROM project_properties WHERE project_id=? ORDER
 $stmt->execute([$project_id]);
 $properties = $stmt->fetchAll();
 
-// Handle form submission
+// Handle form submission and trigger pipeline
 $selected = [];
+$trigger_result = null;
+$trigger_error = null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     foreach ($properties as $prop) {
         $key = 'property_' . $prop['property_id'];
@@ -47,6 +50,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $selected[$prop['property_name']] = isset($_POST[$key]) ? $_POST[$key] : '';
         }
     }
+
+    // Compose flags variable (combine all selected values as space-separated string)
+    $flags = [];
+    foreach ($selected as $vals) {
+        if (is_array($vals)) {
+            foreach ($vals as $v) {
+                if (trim($v) !== '') $flags[] = $v;
+            }
+        } else {
+            if (trim($vals) !== '') $flags[] = $vals;
+        }
+    }
+    $flags_str = trim(implode(' ', $flags));
+
+    // Prepare data for GitLab trigger
+    $token = $project['trigger_token'];
+    $branch = $project['branch'];
+    $git_project_id = $project['git_project_id'];
+    $url = "https://pwgit.centralindia.cloudapp.azure.com/api/v4/projects/{$git_project_id}/trigger/pipeline";
+
+    $post_fields = [
+        'token' => $token,
+        'ref' => $branch,
+        'variables[flags]' => $flags_str
+    ];
+
+    // Trigger the pipeline using cURL
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $post_fields);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $response = curl_exec($ch);
+    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    if (curl_errno($ch)) {
+        $trigger_error = 'Build trigger failed: ' . curl_error($ch);
+    } else if ($http_code >= 400) {
+        $trigger_error = 'Build trigger failed: HTTP ' . $http_code . ' - ' . htmlspecialchars($response);
+    } else {
+        $trigger_result = json_decode($response, true);
+    }
+    curl_close($ch);
 }
 ?>
 <!DOCTYPE html>
@@ -97,6 +141,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </li>
         <?php endforeach; ?>
         </ul>
+        <h2>Pipeline Trigger Result</h2>
+        <?php if ($trigger_error): ?>
+            <div style="color:red;"><b><?php echo $trigger_error; ?></b></div>
+        <?php elseif ($trigger_result): ?>
+            <?php if (isset($trigger_result['error'])): ?>
+                <div style="color:red;"><b>Error:</b> <?php echo htmlspecialchars($trigger_result['error']); ?></div>
+            <?php else: ?>
+                <div><b>Pipeline ID:</b> <?php echo htmlspecialchars($trigger_result['id'] ?? ''); ?></div>
+                <div><b>Status:</b> <?php echo htmlspecialchars($trigger_result['status'] ?? ''); ?></div>
+                <div><b>Branch:</b> <?php echo htmlspecialchars($trigger_result['ref'] ?? ''); ?></div>
+                <div><b>Commit SHA:</b> <?php echo htmlspecialchars($trigger_result['sha'] ?? ''); ?></div>
+                <div><b>Triggered by:</b> <?php echo isset($trigger_result['user']) ? htmlspecialchars($trigger_result['user']['name'] . ' (' . $trigger_result['user']['username'] . ')') : 'N/A'; ?></div>
+                <div><b>Created at:</b> <?php echo htmlspecialchars($trigger_result['created_at'] ?? ''); ?></div>
+                <div><b>Pipeline URL:</b> <?php if (isset($trigger_result['web_url'])): ?><a href="<?php echo htmlspecialchars($trigger_result['web_url']); ?>" target="_blank"><?php echo htmlspecialchars($trigger_result['web_url']); ?></a><?php endif; ?></div>
+            <?php endif; ?>
+        <?php endif; ?>
     <?php endif; ?>
 </body>
 </html>
