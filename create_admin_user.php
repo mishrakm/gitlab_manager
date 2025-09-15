@@ -2,9 +2,9 @@
 // Run this script once to create an initial admin user, then delete it for security.
 require_once 'connection.php';
 
-$username = 'admin';
-$password = 'admin123'; // Change this after first login
-$usertype = 'admin';
+$username = 'dev';
+$password = 'dev123'; // Change this after first login
+$usertype = 'developer';
 
 $hash = password_hash($password, PASSWORD_DEFAULT);
 $stmt = $pdo->prepare("INSERT INTO users (username, password, usertype) VALUES (?, ?, ?)");

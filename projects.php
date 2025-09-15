@@ -4,7 +4,8 @@ if (!isset($_SESSION['user_id']) || !in_array($_SESSION['usertype'], ['admin', '
     header('Location: index.php');
     exit;
 }
-?>
+
+// All code below this line will only run if the user is logged in
 <?php
 require_once 'connection.php';
 
